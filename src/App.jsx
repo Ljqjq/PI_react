@@ -57,7 +57,8 @@ function App() {
         <main className="main-content">
           {activePage === 'students' && (
             <StudentsPage 
-              students={students} 
+              students={students}
+              setStudents={setStudents}
               onAdd={handleAdd} 
               onEdit={handleEdit} 
               onDelete={handleDelete} 
