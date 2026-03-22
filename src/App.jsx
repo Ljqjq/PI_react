@@ -41,33 +41,54 @@ function App() {
     setIsFormOpen(false);
   };
 
+  // src/App.jsx
+// ... inside your App function:
+ 
   return (
     <div className="app-layout">
       <header className="top-nav">
         <div className="logo">CMS</div>
-        <div>James Bond</div>
+        
+        {/* New Top-Right Section */}
+        <div className="user-profile">
+          <span className="notification-bell">🔔</span>
+          <span className="user-name">James Bond</span>
+          <div className="avatar">JB</div>
+        </div>
       </header>
-
+  
       <div className="body-container">
         <aside className="sidebar">
-          <button onClick={() => setActivePage('students')} className={activePage === 'students' ? 'active' : ''}>Students</button>
-          <button onClick={() => setActivePage('tasks')} className={activePage === 'tasks' ? 'active' : ''}>Tasks</button>
+          {/* Added Dashboard button */}
+          <button 
+            onClick={() => setActivePage('dashboard')} 
+            className={activePage === 'dashboard' ? 'active' : ''}
+          >Dashboard</button>
+          <button 
+            onClick={() => setActivePage('students')} 
+            className={activePage === 'students' ? 'active' : ''}
+          >Students</button>
+          <button 
+            onClick={() => setActivePage('tasks')} 
+            className={activePage === 'tasks' ? 'active' : ''}
+          >Tasks</button>
         </aside>
-
+  
         <main className="main-content">
+          {activePage === 'dashboard' && <h2>Dashboard Overview</h2>}
           {activePage === 'students' && (
             <StudentsPage 
-              students={students}
-              setStudents={setStudents}
-              onAdd={handleAdd} 
-              onEdit={handleEdit} 
-              onDelete={handleDelete} 
+            students={students} 
+            setStudents={setStudents} 
+            onAdd={handleAdd} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete} 
             />
           )}
+          {activePage === 'tasks' && <h2>Tasks Board</h2>}
         </main>
       </div>
-
-      {/* Modals */}
+    {/* PASTE THIS BLOCK RIGHT BEFORE THE LAST </div> */}
       {isFormOpen && (
         <StudentsFormModal 
           student={selectedStudent} 

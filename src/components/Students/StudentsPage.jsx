@@ -1,63 +1,102 @@
-// src/components/Students/StudentsPage.jsx
-import React from 'react';
+import React, { useState } from 'react';
 
-const StudentsPage = ({ students, setStudents, onAdd, onEdit, onDelete }) => {
+const StudentsPage = ({ students, onAdd, onEdit, onDelete }) => {
+  const [selectedIds, setSelectedIds] = useState([]);
   
-  // Logic to toggle active status via checkbox
-  const handleCheckboxChange = (id) => {
-    setStudents(students.map(student => 
-      student.id === id ? { ...student, active: !student.active } : student
-    ));
+  // --- Pagination Logic ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 5; // How many rows to show per page
+  
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+  const currentStudents = students.slice(indexOfFirstStudent, indexOfLastStudent);
+  const totalPages = Math.ceil(students.length / studentsPerPage);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
   };
 
   return (
-    <div className="table-wrapper">
-      <div className="table-header">
+    <div className="students-container">
+      <div className="table-header-row">
         <h2>Students</h2>
-        <button className="add-btn" onClick={onAdd}>+ Add Student</button>
+        <button className="add-square-btn" onClick={onAdd}>+</button>
       </div>
 
-      <table>
+      <table className="students-table">
         <thead>
           <tr>
-            <th>Status</th>
-            <th>Name</th>
+            <th><input type="checkbox" /></th>
             <th>Group</th>
+            <th>Name</th>
             <th>Gender</th>
             <th>Birthday</th>
+            <th>Status</th>
             <th>Options</th>
           </tr>
         </thead>
         <tbody>
-          {students.map((s) => (
+          {currentStudents.map((s) => (
             <tr key={s.id}>
-              {/* Checkbox controls the 'active' status */}
               <td>
                 <input 
                   type="checkbox" 
-                  checked={s.active || false} 
-                  onChange={() => handleCheckboxChange(s.id)} 
+                  checked={selectedIds.includes(s.id)} 
+                  onChange={() => toggleSelect(s.id)} 
                 />
               </td>
-              
-              <td>{s.firstName} {s.lastName}</td>
-              <td>{s.group}</td>
-              <td>{s.gender}</td>
-              <td>{s.dob}</td>
-              
+              <td className="bold">{s.group}</td>
+              <td className="bold">{s.firstName} {s.lastName}</td>
+              <td className="bold">{s.gender === 'Male' ? 'M' : 'F'}</td>
+              <td className="bold">{s.dob}</td>
               <td>
-                {/* Visual Status Dot */}
                 <span className={`dot ${s.active ? 'green' : 'gray'}`}></span>
               </td>
-              
               <td>
-                <button onClick={() => onEdit(s)}>✎</button>
-                <button onClick={() => onDelete(s)}>✕</button>
+                <div className="options-cell">
+                  <button className="icon-btn" onClick={() => onEdit(s)}>✎</button>
+                  <button className="icon-btn" onClick={() => onDelete(s)}>✕</button>
+                </div>
               </td>
             </tr>
           ))}
+          
+          {/* Fill empty rows if page isn't full to keep table height consistent */}
+          {currentStudents.length < studentsPerPage && 
+            [...Array(studentsPerPage - currentStudents.length)].map((_, i) => (
+              <tr key={`empty-${i}`} className="empty-row">
+                <td><input type="checkbox" disabled /></td>
+                <td></td><td></td><td></td><td></td><td></td><td></td>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button onClick={() => paginate(currentPage - 1)}>&lt;</button>
+        
+        {[...Array(totalPages)].map((_, i) => (
+          <button 
+            key={i + 1} 
+            onClick={() => paginate(i + 1)}
+            className={currentPage === i + 1 ? 'active' : ''}
+          >
+            {i + 1}
+          </button>
+        ))}
+        
+        <button onClick={() => paginate(currentPage + 1)}>&gt;</button>
+      </div>
     </div>
   );
 };
